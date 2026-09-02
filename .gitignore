@@ -1,0 +1,14 @@
+.DS_Store
+env/
+__pycache__/
+*.pyc
+
+# dbt artifacts
+target/
+dbt_packages/
+logs/
+.user.yml
+
+# raw data and the local DuckDB database file (both regenerated from Kaggle, see README)
+data/*.csv
+data/*.duckdb

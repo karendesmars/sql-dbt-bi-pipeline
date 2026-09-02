@@ -1,0 +1,10 @@
+name: sql-dbt-bi-pipeline
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - pandas=3.0.5
+  - pip
+  - pip:
+      - dbt-core==1.12.3
+      - dbt-duckdb==1.11.0

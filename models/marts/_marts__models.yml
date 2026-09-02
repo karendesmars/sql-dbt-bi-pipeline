@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: One row per customer (customer_id, order-level identifier used by orders).
+    columns:
+      - name: customer_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_products
+    description: One row per product, with the English category name joined in.
+    columns:
+      - name: product_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: fct_order_items
+    description: >
+      One row per order item. Payment totals are at the order grain and repeat
+      across items of the same order (see model SQL for details).
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_customers')
+                field: customer_id
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_products')
+                field: product_id
+      - name: price
+        data_tests:
+          - not_null
