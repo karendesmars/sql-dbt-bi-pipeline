@@ -13,3 +13,6 @@ logs/
 data/*.csv
 data/*.duckdb
 NOTES_PRIVEES.md
+
+# local Metabase app data (account, dashboards), machine-specific
+.metabase-data/

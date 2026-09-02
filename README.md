@@ -98,7 +98,26 @@ Note: `conda env create -f environment.yml` creates the environment in conda's d
 
 ## BI layer
 
-Not built yet. Power BI Desktop does not run on macOS; the plan is to either use Power BI Service (web) or Metabase against the DuckDB output. This section will be updated once that decision is made and the dashboard exists.
+Power BI Desktop does not run on macOS, and Power BI Service (web) has no simple way to read a local DuckDB file. Using [Metabase](https://www.metabase.com/) instead, self-hosted via Docker, connected directly to `ecommerce.duckdb`.
+
+The official `metabase/metabase` image is Alpine-based (musl libc) and the community DuckDB driver's native library is built for glibc, loading it crashes the JVM on Alpine. `docker/metabase/Dockerfile` builds Metabase on a Debian-based JRE instead, per the [driver's own instructions](https://github.com/motherduckdb/metabase_duckdb_driver).
+
+```bash
+# Build the image (once)
+docker build -t metabase-duckdb-local docker/metabase
+
+# Run it, with the data folder and Metabase's own app data mounted so both
+# the DuckDB file and your Metabase account/dashboards persist across restarts
+mkdir -p .metabase-data
+docker run -d --name metabase-sql-dbt \
+  -p 3000:3000 \
+  -v "$(pwd)/data:/data" \
+  -v "$(pwd)/.metabase-data:/home/metabase/data" \
+  -e MB_DB_FILE=/home/metabase/data/metabase.db \
+  metabase-duckdb-local
+```
+
+Open `http://localhost:3000`, create a local account, then add a database: type **DuckDB**, file path **`/data/ecommerce.duckdb`** (that path is inside the container, mapped to this repo's `data/` folder).
 
 ---
 
