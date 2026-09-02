@@ -32,7 +32,7 @@ select
     order_items.price,
     order_items.freight_value,
     payments.total_payment_value,
-    payments.payment_installments_count
+    payments.payment_records_count
 from order_items
 left join orders
     on order_items.order_id = orders.order_id
