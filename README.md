@@ -1,6 +1,6 @@
 # SQL / dbt / BI Pipeline
 
-**Status: pipeline written, not run yet.** The raw data has not been downloaded locally, so no model has been executed or tested against real rows.
+**Status: executed and tested.** `dbt run` (13 models) and `dbt test` (10 tests) both pass against the real dataset.
 
 **Dataset:** [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), 9 relational CSV files (orders, order items, payments, reviews, customers, products, sellers, geolocation, category translation), about 100,000 orders
 **Tools:** SQL, dbt (`dbt-duckdb`), DuckDB as the local warehouse
@@ -71,6 +71,8 @@ dbt test      # runs the data tests (uniqueness, not-null, relationships)
 
 `DBT_ECOMMERCE_DB_PATH` points dbt to a local DuckDB file (created automatically on first run). This is set with an environment variable rather than hardcoded in `profiles.yml`, so the path is not tied to one specific machine, `profiles.yml` lives in `~/.dbt/` and is not part of this repo (standard dbt convention, keeps machine-specific config out of git).
 
+Note: `conda env create -f environment.yml` creates the environment in conda's default location (`~/miniconda3/envs/`), not inside this project folder. dbt installs thousands of small package files, so keeping the environment out of any cloud-synced folder (iCloud Drive, Dropbox, etc.) avoids those files being silently offloaded and re-downloaded on every import, which can make commands like `dbt run` hang for minutes.
+
 ---
 
 ## Approach
@@ -102,4 +104,6 @@ Not built yet. Power BI Desktop does not run on macOS; the plan is to either use
 
 ## Key Findings
 
-Not written yet. This section will be filled in once the pipeline has been run and tested against the real data.
+- **The pipeline builds 99,441 unique customers, 32,951 products, and 112,650 order items** from the 9 raw CSVs, with all 10 data quality tests passing (no orphaned foreign keys between the fact table and the two dimensions).
+- **Deliveries arrive early on average.** Across delivered orders, the average delivery takes 12.4 days, and lands 12.0 days *before* the estimated delivery date on average. Only 6.6% of order items are delivered later than their estimate. This suggests Olist's estimated delivery dates are set conservatively rather than being an accurate forecast, worth keeping in mind for anyone using `order_estimated_delivery_at` as a planning input.
+- **Revenue is concentrated in a handful of categories.** The top 5 product categories by revenue are health_beauty ($1.26M), watches_gifts ($1.21M), bed_bath_table ($1.04M), sports_leisure ($988K), and computers_accessories ($912K). These figures come directly from `fct_order_items` joined to `dim_products`, the same query pattern the BI layer will build on.
