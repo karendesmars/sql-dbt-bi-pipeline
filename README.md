@@ -119,10 +119,16 @@ docker run -d --name metabase-sql-dbt \
 
 Open `http://localhost:3000`, create a local account, then add a database: type **DuckDB**, file path **`/data/ecommerce.duckdb`** (that path is inside the container, mapped to this repo's `data/` folder).
 
+### Dashboard
+
+![Metabase dashboard: key metrics and revenue by category](docs/screenshots/dashboard-overview.png)
+
+Four KPI cards (total order items, products, customers, and average delivery delay) plus a top-5 product categories by revenue chart, written as a native SQL question in Metabase joining `fct_order_items` to `dim_products`, sorted descending and limited to 5 rows.
+
 ---
 
 ## Key Findings
 
 - **The pipeline builds 99,441 unique customers, 32,951 products, and 112,650 order items** from the 9 raw CSVs, with all 10 data quality tests passing (no orphaned foreign keys between the fact table and the two dimensions).
 - **Deliveries arrive early on average.** Across delivered orders, the average delivery takes 12.4 days, and lands 12.0 days *before* the estimated delivery date on average. Only 6.6% of order items are delivered later than their estimate. This suggests Olist's estimated delivery dates are set conservatively rather than being an accurate forecast, worth keeping in mind for anyone using `order_estimated_delivery_at` as a planning input.
-- **Revenue is concentrated in a handful of categories.** The top 5 product categories by revenue are health_beauty ($1.26M), watches_gifts ($1.21M), bed_bath_table ($1.04M), sports_leisure ($988K), and computers_accessories ($912K). These figures come directly from `fct_order_items` joined to `dim_products`, the same query pattern the BI layer will build on.
+- **Revenue is concentrated in a handful of categories.** The top 5 product categories by revenue are health_beauty ($1.26M), watches_gifts ($1.21M), bed_bath_table ($1.04M), sports_leisure ($988K), and computers_accessories ($912K). These figures come directly from `fct_order_items` joined to `dim_products`, the same query behind the dashboard's revenue chart below.
